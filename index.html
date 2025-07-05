@@ -3,87 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VeriChain - Certificate Verification</title>
+    <title>VeriChain - The New Standard in Verifiable Credentials</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 </head>
 <body>
-    <div class="container">
+
+    <header class="landing-header">
+        <div>
+            <div>VeriChain</div>
+            <a href="admin.html">Organizer Login</a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div>
+            <h1>The New Standard in Verifiable Credentials.</h1>
+            <p>
+                Issue, verify, and manage tamper-proof certificates on the blockchain. Secure, transparent, and instantly verifiable for life.
+            </p>
+            <a href="verify.html">Verify a Certificate</a>
+        </div>
+    </section>
+
+    <section class="features">
         <header>
-            <h1>VeriChain</h1>
-            <p>Instant, On-Chain Proof of Achievement</p>
+            <h2>Trust Through Transparency</h2>
+            <p>VeriChain solves the problem of certificate fraud by creating an immutable, publicly auditable record of achievement.</p>
         </header>
 
-        <div id="auth-section">
-            <button id="connectButton">Connect Wallet to Begin</button>
-        </div>
-
-        <main id="app-body" class="hidden">
+        <div class="features-grid">
             <div>
-                <div class="card">
-                    <h2>My Certificates</h2>
-                    <div id="my-certs-loader"><p>Scanning...</p></div>
-                    <ul id="my-certs-list"></ul>
-                    <p id="no-certs-message" class="hidden">No certificates found for your connected wallet.</p>
+                <div class="icon-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                 </div>
-                <div class="card" style="margin-top: 2rem;">
-                    <h2>Verify by ID</h2>
-                    <form id="verify-by-id-form">
-                        <input type="number" id="certIdInput" placeholder="Enter Certificate ID" required>
-                        <button type="submit">Verify</button>
-                    </form>
-                </div>
+                <h3>Tamper-Proof</h3>
+                <p>Once a certificate is issued on the blockchain, it cannot be altered or faked by anyone.</p>
             </div>
             
             <div>
-                <div id="certificate-display-area" class="hidden">
-                    <div>
-                        <div class="cert-header">
-                            <h3>CERTIFICATE of ACHIEVEMENT</h3>
-                            <p>Issued by VeriChain</p>
-                        </div>
-                        <div class="cert-body">
-                            <p>This certifies that</p>
-                            <p id="cert-recipient-name"></p>
-                            <p>has successfully participated in</p>
-                        </div>
-                        <div class="cert-body">
-                            <p id="cert-event-name"></p>
-                            <p>on <span id="cert-event-date"></span> at <span id="cert-location"></span></p>
-                        </div>
-                        <div class="cert-footer">
-                            <div>
-                                <p>✓ Verified On-Chain</p>
-                                <p>ID: <span id="cert-id"></span></p>
-                            </div>
-                            <div>
-                                <p>Participants: <span id="cert-participants"></span></p>
-                                <p>Issued: <span id="cert-issue-date"></span></p>
-                            </div>
-                        </div>
-                    </div>
+                <div class="icon-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 </div>
-                
-                <div id="cert-placeholder">
-                    <p>Select one of your certificates or enter an ID to view details.</p>
-                </div>
-
-                <p id="verify-error" class="hidden"></p>
+                <h3>Instantly Verifiable</h3>
+                <p>Anyone in the world, from employers to universities, can verify a credential in seconds with just an ID.</p>
             </div>
-        </main>
-    </div>
-<script>
-    // --- V3 CONFIGURATION ---
-    const contractAddress = "0xCd3F074104d3e9b09d04833F2Fb92ac92d8A1931";
-    const contractABI = [ { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "uint256", "name": "certificateId", "type": "uint256" }, { "indexed": true, "internalType": "uint256", "name": "eventId", "type": "uint256" }, { "indexed": false, "internalType": "string", "name": "recipientName", "type": "string" }, { "indexed": true, "internalType": "address", "name": "recipientAddress", "type": "address" } ], "name": "CertificateIssued", "type": "event" }, { "inputs": [ { "internalType": "uint256", "name": "_eventId", "type": "uint256" }, { "internalType": "string", "name": "_recipientName", "type": "string" }, { "internalType": "address", "name": "_recipientAddress", "type": "address" } ], "name": "claimCertificate", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "string", "name": "_name", "type": "string" }, { "internalType": "uint256", "name": "_date", "type": "uint256" }, { "internalType": "string", "name": "_location", "type": "string" } ], "name": "createEvent", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "newDistributor", "type": "address" } ], "name": "DistributorChanged", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "uint256", "name": "eventId", "type": "uint256" }, { "indexed": false, "internalType": "string", "name": "name", "type": "string" }, { "indexed": false, "internalType": "uint256", "name": "date", "type": "uint256" } ], "name": "EventCreated", "type": "event" }, { "inputs": [ { "internalType": "uint256", "name": "_eventId", "type": "uint256" }, { "internalType": "string[]", "name": "_recipientNames", "type": "string[]" }, { "internalType": "address[]", "name": "_recipientAddresses", "type": "address[]" } ], "name": "issueBatchCertificates", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "_eventId", "type": "uint256" }, { "internalType": "string", "name": "_recipientName", "type": "string" }, { "internalType": "address", "name": "_recipientAddress", "type": "address" } ], "name": "issueSingleCertificate", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "_newDistributor", "type": "address" } ], "name": "setDistributor", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "certificateCounter", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "name": "certificates", "outputs": [ { "internalType": "uint256", "name": "id", "type": "uint256" }, { "internalType": "uint256", "name": "eventId", "type": "uint256" }, { "internalType": "string", "name": "recipientName", "type": "string" }, { "internalType": "address", "name": "recipientAddress", "type": "address" }, { "internalType": "uint256", "name": "issueDate", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "distributor", "outputs": [ { "internalType": "address", "name": "", "type": "address" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "eventCounter", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "name": "events", "outputs": [ { "internalType": "uint256", "name": "id", "type": "uint256" }, { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "uint256", "name": "date", "type": "uint256" }, { "internalType": "string", "name": "location", "type": "string" }, { "internalType": "uint256", "name": "certificatesIssued", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "_certificateId", "type": "uint256" } ], "name": "getCertificateDetails", "outputs": [ { "components": [ { "internalType": "uint256", "name": "id", "type": "uint256" }, { "internalType": "uint256", "name": "eventId", "type": "uint256" }, { "internalType": "string", "name": "recipientName", "type": "string" }, { "internalType": "address", "name": "recipientAddress", "type": "address" }, { "internalType": "uint256", "name": "issueDate", "type": "uint256" } ], "internalType": "struct VeriChain.Certificate", "name": "", "type": "tuple" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "_eventId", "type": "uint256" } ], "name": "getEventDetails", "outputs": [ { "components": [ { "internalType": "uint256", "name": "id", "type": "uint256" }, { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "uint256", "name": "date", "type": "uint256" }, { "internalType": "string", "name": "location", "type": "string" }, { "internalType": "uint256", "name": "certificatesIssued", "type": "uint256" }, { "internalType": "uint256[]", "name": "certificateIds", "type": "uint256[]" } ], "internalType": "struct VeriChain.Event", "name": "", "type": "tuple" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "owner", "outputs": [ { "internalType": "address", "name": "", "type": "address" } ], "stateMutability": "view", "type": "function" } ];
-    const connectButton = document.getElementById('connectButton'); const appBody = document.getElementById('app-body'); const myCertsLoader = document.getElementById('my-certs-loader'); const myCertsList = document.getElementById('my-certs-list'); const noCertsMessage = document.getElementById('no-certs-message'); const verifyByIdForm = document.getElementById('verify-by-id-form'); const certIdInput = document.getElementById('certIdInput'); const certificateDisplayArea = document.getElementById('certificate-display-area'); const certPlaceholder = document.getElementById('cert-placeholder'); const verifyError = document.getElementById('verify-error'); let provider, signer, contract;
-    async function connectWallet() { if (typeof window.ethereum === 'undefined') return alert("MetaMask not installed."); try { await window.ethereum.request({ method: 'eth_requestAccounts' }); await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0xaa36a7' }]}); provider = new ethers.providers.Web3Provider(window.ethereum); signer = provider.getSigner(); contract = new ethers.Contract(contractAddress, contractABI, provider); document.getElementById('auth-section').classList.add('hidden'); appBody.classList.remove('hidden'); findMyCertificates(); } catch (error) { alert("Failed to connect wallet."); } }
-    async function findMyCertificates() { myCertsLoader.classList.remove('hidden'); myCertsList.innerHTML = ''; noCertsMessage.classList.add('hidden'); try { const userAddress = await signer.getAddress(); const filter = contract.filters.CertificateIssued(null, null, null, userAddress); const userCerts = await contract.queryFilter(filter); myCertsLoader.classList.add('hidden'); if (userCerts.length === 0) { noCertsMessage.classList.remove('hidden'); } else { userCerts.forEach(event => { const certId = event.args.certificateId.toString(); const li = document.createElement('li'); li.innerHTML = `<a href="#">ID: <span>${certId}</span> - ${event.args.recipientName}</a>`; li.addEventListener('click', e => { e.preventDefault(); certIdInput.value = certId; verifyByIdForm.dispatchEvent(new Event('submit')); }); myCertsList.appendChild(li); }); } } catch (error) { myCertsLoader.classList.add('hidden'); noCertsMessage.textContent = "Error fetching certificates."; noCertsMessage.classList.remove('hidden'); } }
-    verifyByIdForm.addEventListener('submit', async (e) => { e.preventDefault(); const certId = certIdInput.value; if (!certId) return; certificateDisplayArea.classList.add('hidden'); certPlaceholder.classList.remove('hidden'); verifyError.classList.add('hidden'); try { const certDetails = await contract.getCertificateDetails(certId); if (certDetails.id.toNumber() === 0) throw new Error("Certificate ID not found."); const eventDetails = await contract.getEventDetails(certDetails.eventId); document.getElementById('cert-recipient-name').textContent = certDetails.recipientName; document.getElementById('cert-event-name').textContent = eventDetails.name; document.getElementById('cert-event-date').textContent = new Date(eventDetails.date.toNumber() * 1000).toLocaleDateString(); document.getElementById('cert-location').textContent = eventDetails.location; document.getElementById('cert-id').textContent = `#${certDetails.id.toString()}`; document.getElementById('cert-participants').textContent = eventDetails.certificatesIssued.toString(); document.getElementById('cert-issue-date').textContent = new Date(certDetails.issueDate.toNumber() * 1000).toLocaleDateString(); certPlaceholder.classList.add('hidden'); certificateDisplayArea.classList.remove('hidden'); } catch (error) { verifyError.textContent = error.message; verifyError.classList.remove('hidden'); } });
-    connectButton.addEventListener('click', connectWallet);
-</script>
+            
+            <div>
+                <div class="icon-container">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                </div>
+                <h3>Effortless Issuance</h3>
+                <p>Our live claim system allows attendees to receive their certificates instantly via a simple QR code scan.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="landing-footer">
+        <p>&copy; 2025 VeriChain. All rights reserved.</p>
+    </footer>
+
 </body>
 </html>
