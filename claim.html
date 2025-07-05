@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claim Your Certificate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+</head>
+<body class="claim-page">
+
+    <div id="claim-container" class="card container-small">
+        
+        <div id="connect-state">
+            <h1>Almost there!</h1>
+            <p>Connect your wallet to load event details and claim your certificate.</p>
+            <button id="connectButton">Connect Wallet</button>
+        </div>
+
+        <div id="claim-state" class="hidden">
+            <header>
+                <h1>You are claiming a certificate for:</h1>
+                <p id="event-name"></p>
+            </header>
+
+            <form id="claim-form">
+                <div>
+                    <label for="recipientName">Your Full Name</label>
+                    <input type="text" id="recipientName" placeholder="e.g., Jasneet Singh" required>
+                </div>
+                <div>
+                    <label for="recipientAddress">Your Wallet Address</label>
+                    <input type="text" id="recipientAddress" placeholder="0x..." required>
+                </div>
+                <button id="claimButton" type="submit" disabled>Claim My Certificate</button>
+            </form>
+        </div>
+        
+        <div id="status-message" class="hidden"></div>
+    </div>
+
+<script>
+    // --- V3 CONFIGURATION ---
+    const contractAddress = "0xCd3F074104d3e9b09d04833F2Fb92ac92d8A1931";
+    const contractABI = [ { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "uint256", "name": "certificateId", "type": "uint256" }, { "indexed": true, "internalType": "uint256", "name": "eventId", "type": "uint256" }, { "indexed": false, "internalType": "string", "name": "recipientName", "type": "string" }, { "indexed": true, "internalType": "address", "name": "recipientAddress", "type": "address" } ], "name": "CertificateIssued", "type": "event" }, { "inputs": [ { "internalType": "uint256", "name": "_eventId", "type": "uint256" }, { "internalType": "string", "name": "_recipientName", "type": "string" }, { "internalType": "address", "name": "_recipientAddress", "type": "address" } ], "name": "claimCertificate", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "string", "name": "_name", "type": "string" }, { "internalType": "uint256", "name": "_date", "type": "uint256" }, { "internalType": "string", "name": "_location", "type": "string" } ], "name": "createEvent", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "newDistributor", "type": "address" } ], "name": "DistributorChanged", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "uint256", "name": "eventId", "type": "uint256" }, { "indexed": false, "internalType": "string", "name": "name", "type": "string" }, { "indexed": false, "internalType": "uint256", "name": "date", "type": "uint256" } ], "name": "EventCreated", "type": "event" }, { "inputs": [ { "internalType": "uint256", "name": "_eventId", "type": "uint256" }, { "internalType": "string[]", "name": "_recipientNames", "type": "string[]" }, { "internalType": "address[]", "name": "_recipientAddresses", "type": "address[]" } ], "name": "issueBatchCertificates", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "_eventId", "type": "uint256" }, { "internalType": "string", "name": "_recipientName", "type": "string" }, { "internalType": "address", "name": "_recipientAddress", "type": "address" } ], "name": "issueSingleCertificate", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "_newDistributor", "type": "address" } ], "name": "setDistributor", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "certificateCounter", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "name": "certificates", "outputs": [ { "internalType": "uint256", "name": "id", "type": "uint256" }, { "internalType": "uint256", "name": "eventId", "type": "uint256" }, { "internalType": "string", "name": "recipientName", "type": "string" }, { "internalType": "address", "name": "recipientAddress", "type": "address" }, { "internalType": "uint256", "name": "issueDate", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "distributor", "outputs": [ { "internalType": "address", "name": "", "type": "address" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "eventCounter", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "name": "events", "outputs": [ { "internalType": "uint256", "name": "id", "type": "uint256" }, { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "uint256", "name": "date", "type": "uint256" }, { "internalType": "string", "name": "location", "type": "string" }, { "internalType": "uint256", "name": "certificatesIssued", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "_certificateId", "type": "uint256" } ], "name": "getCertificateDetails", "outputs": [ { "components": [ { "internalType": "uint256", "name": "id", "type": "uint256" }, { "internalType": "uint256", "name": "eventId", "type": "uint256" }, { "internalType": "string", "name": "recipientName", "type": "string" }, { "internalType": "address", "name": "recipientAddress", "type": "address" }, { "internalType": "uint256", "name": "issueDate", "type": "uint256" } ], "internalType": "struct VeriChain.Certificate", "name": "", "type": "tuple" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "_eventId", "type": "uint256" } ], "name": "getEventDetails", "outputs": [ { "components": [ { "internalType": "uint256", "name": "id", "type": "uint256" }, { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "uint256", "name": "date", "type": "uint256" }, { "internalType": "string", "name": "location", "type": "string" }, { "internalType": "uint256", "name": "certificatesIssued", "type": "uint256" }, { "internalType": "uint256[]", "name": "certificateIds", "type": "uint256[]" } ], "internalType": "struct VeriChain.Event", "name": "", "type": "tuple" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "owner", "outputs": [ { "internalType": "address", "name": "", "type": "address" } ], "stateMutability": "view", "type": "function" } ];
+    const connectState = document.getElementById('connect-state');
+    const claimState = document.getElementById('claim-state');
+    const connectButton = document.getElementById('connectButton');
+    const eventNameEl = document.getElementById('event-name');
+    const claimForm = document.getElementById('claim-form');
+    const nameInput = document.getElementById('recipientName');
+    const addressInput = document.getElementById('recipientAddress');
+    const claimButton = document.getElementById('claimButton');
+    const statusMessage = document.getElementById('status-message');
+    let eventId;
+    let provider;
+    function setStatus(message, isError = false) {
+        statusMessage.textContent = message;
+        statusMessage.className = isError ? 'status-error' : 'status-success';
+        statusMessage.classList.remove('hidden');
+    }
+    function checkInputs() {
+        claimButton.disabled = !(nameInput.value.trim() && ethers.utils.isAddress(addressInput.value.trim()));
+    }
+    async function connectAndLoad() {
+        if (typeof window.ethereum === 'undefined') {
+            return alert("MetaMask is required to use this page. Please install it.");
+        }
+        try {
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0xaa36a7' }]});
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            const params = new URLSearchParams(window.location.search);
+            eventId = params.get('eventId');
+            if (!eventId) throw new Error("Event ID not found in URL.");
+            const contract = new ethers.Contract(contractAddress, contractABI, provider);
+            const eventDetails = await contract.getEventDetails(eventId);
+            if (eventDetails.id.toNumber() === 0) throw new Error("This event does not exist.");
+            eventNameEl.textContent = eventDetails.name;
+            connectState.classList.add('hidden');
+            claimState.classList.remove('hidden');
+        } catch (error) {
+            connectState.innerHTML = `<p>${error.message}</p>`;
+        }
+    }
+    // REPLACE the old handleClaim function with this one
+async function handleClaim(e) {
+    e.preventDefault();
+    claimButton.disabled = true;
+    claimButton.textContent = 'Processing...';
+    setStatus('Submitting your claim to the blockchain...', false);
+
+    try {
+        // Get the data from the form
+        const recipientName = nameInput.value.trim();
+        const recipientAddress = addressInput.value.trim();
+
+        // This is the new, secure part. We send the data to our API.
+        const response = await fetch('/api/claim', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                eventId: eventId,
+                recipientName: recipientName,
+                recipientAddress: recipientAddress,
+            }),
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            // If the API returned an error, show it
+            throw new Error(result.message || 'An unknown error occurred.');
+        }
+
+        // Success!
+        claimState.classList.add('hidden');
+        setStatus(`✅ Congratulations! Your certificate has been issued successfully. You can now verify it on the main page.`, false);
+
+    } catch (error) {
+        console.error("Claim failed:", error);
+        setStatus(`Claim failed: ${error.message}`, true);
+        claimButton.disabled = false;
+        claimButton.textContent = 'Claim My Certificate';
+    }
+}
+    connectButton.addEventListener('click', connectAndLoad);
+    nameInput.addEventListener('input', checkInputs);
+    addressInput.addEventListener('input', checkInputs);
+    claimForm.addEventListener('submit', handleClaim);
+</script>
+</body>
+</html>

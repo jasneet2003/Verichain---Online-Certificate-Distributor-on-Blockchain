@@ -1,0 +1,352 @@
+/*
+--- VERCHAIN DAPP REDESIGN V2 ---
+---      styles-v2.css       ---
+---   UI/UX by Gemini AI    ---
+*/
+
+/* ------------------- */
+/* -- 1. ROOT & THEME -- */
+/* ------------------- */
+:root {
+  --bg-dark: #0F172A; /* slate-900 */
+  --bg-card: rgba(30, 41, 59, 0.5); /* slate-800 with transparency */
+  --bg-input: #020617; /* slate-950 */
+  --bg-hover: rgba(51, 65, 85, 0.7); /* slate-700 with transparency */
+
+  --text-primary: #E2E8F0; /* slate-200 */
+  --text-secondary: #94A3B8; /* slate-400 */
+  --text-tertiary: #64748B; /* slate-500 */
+  
+  --accent-blue: #38BDF8;   /* sky-400 */
+  --accent-purple: #8B5CF6; /* violet-500 */
+  --accent-green: #34D399;  /* emerald-400 */
+
+  --border-glow: rgba(56, 189, 248, 0.3);
+  --border-subtle: rgba(56, 189, 248, 0.15);
+  --border-input: #334155; /* slate-700 */
+
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
+
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+/* ------------------- */
+/* -- 2. GLOBAL RESET -- */
+/* ------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* ------------------------- */
+/* -- 3. TYPOGRAPHY & LINKS -- */
+/* ------------------------- */
+h1, h2, h3, h4 {
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+h2 { font-size: 1.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-input); padding-bottom: 0.75rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.1rem; }
+
+p {
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+a {
+  color: var(--accent-blue);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+a:hover { color: white; }
+
+/* ----------------- */
+/* -- 4. UI SHELLS -- */
+/* ----------------- */
+.container, #app-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+#app-container { max-width: 896px; }
+.container-narrow { max-width: 768px; }
+.container-small { max-width: 480px; }
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ---------------------- */
+/* -- 5. UI COMPONENTS -- */
+/* ---------------------- */
+
+/* --- Buttons --- */
+button {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  color: white;
+  display: block;
+  width: 100%;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+button:disabled {
+  background-color: var(--border-input);
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Primary Button (Connect, Claim, etc.) */
+#connectButton, #claimButton, #verify-event-form button {
+  background: linear-gradient(45deg, var(--accent-blue), #60a5fa);
+  box-shadow: 0 0 20px 0px rgba(56, 189, 248, 0.2);
+}
+#connectButton:hover:not(:disabled),
+#claimButton:hover:not(:disabled),
+#verify-event-form button:hover:not(:disabled) {
+  box-shadow: 0 0 30px 0px rgba(56, 189, 248, 0.4);
+}
+
+/* Action Buttons */
+#create-event-form button { background: var(--accent-green); }
+#issue-single-form button { background: var(--accent-purple); }
+#issue-batch-form button { background: var(--accent-purple); }
+#set-distributor-form button { background: #F43F5E; } /* rose-500 */
+#verify-by-id-form button { background: #6366F1; } /* indigo-500 */
+#generate-qr-form button { background: var(--text-tertiary); }
+
+
+/* --- Forms --- */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+textarea {
+  width: 100%;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-md);
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px var(--border-glow);
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* ----------------------- */
+/* -- 6. PAGE-SPECIFIC -- */
+/* ----------------------- */
+
+/* --- Universal --- */
+header, footer { text-align: center; }
+header h1 { color: white; font-weight: 700; }
+header p { color: var(--text-secondary); font-size: 1.125rem; }
+
+/* --- Admin Panel (admin.html) --- */
+#dashboard { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+#dashboard > div { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 1.5rem; backdrop-filter: blur(10px); }
+#qr-code-container { margin-top: 1.5rem; text-align: center; }
+#qrcode { background: white; border-radius: var(--radius-md); padding: 1rem; display: inline-block; margin-top: 1rem; }
+#claim-url { word-break: break-all; }
+#logger { background-color: var(--bg-input); border-radius: var(--radius-lg); padding: 1rem; height: 200px; overflow-y: auto; font-family: var(--font-mono); font-size: 0.875rem; border: 1px solid var(--border-input); }
+#logger p span { color: var(--text-tertiary); margin-right: 0.5rem; }
+.log-error { color: #F43F5E; }
+.log-success { color: var(--accent-green); }
+
+
+/* --- Claim Page (claim.html) --- */
+@keyframes animated-claim-bg {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+body.claim-page {
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+  background: linear-gradient(135deg, var(--bg-dark), #020617, var(--bg-dark), #1e3a8a);
+  background-size: 400% 400%;
+  animation: animated-claim-bg 15s ease infinite;
+}
+#claim-container.card {
+  position: relative;
+  overflow: hidden;
+  border-color: transparent;
+}
+
+#claim-state header h1 { font-size: 1.125rem; color: var(--text-secondary); font-weight: 500;}
+#claim-state header p { font-size: 2rem; color: var(--accent-blue); font-weight: 700; }
+#status-message { padding: 1rem; border-radius: var(--radius-md); font-weight: 500; }
+.status-success { background-color: rgba(52, 211, 153, 0.1); color: var(--accent-green); }
+.status-error { background-color: rgba(244, 63, 94, 0.1); color: #F43F5E; }
+#claimButton:disabled { animation: pulse 2s infinite ease-in-out; }
+@keyframes pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+
+
+/* --- Event Verification (event.html) --- */
+#verify-event-form { flex-direction: row; align-items: center; gap: 1rem; }
+#verify-event-form input { flex-grow: 1; }
+#verify-event-form button { width: auto; }
+#event-display-area h3 { color: white; }
+#event-display-area > div:first-child > div { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.5rem; }
+#event-display-area .stat-card { background-color: var(--bg-input); padding: 1rem; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--border-input); }
+#event-display-area .stat-card p:first-child { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-tertiary); }
+#event-display-area .stat-card p:last-child { font-size: 1.25rem; color: white; font-weight: 600; }
+#certificate-list-container { margin-top: 2rem; border-top: 1px solid var(--border-input); padding-top: 1.5rem; }
+#certificate-list-container ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+#certificate-list-container li { display: flex; justify-content: space-between; align-items: center; background: var(--bg-input); padding: 0.75rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-input); }
+#certificate-list-container li span:first-child { font-family: var(--font-mono); color: var(--text-tertiary); }
+
+
+/* --- Certificate Verification (index.html) --- */
+/* FIX: Add space below connect button */
+#auth-section { margin-bottom: 2rem; }
+/* FIX: Make connect button smaller */
+#auth-section button { padding: 0.75rem 2rem; font-size: 1rem; display: inline-block; width: auto; }
+
+#app-body { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; align-items: flex-start; }
+#my-certs-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+#my-certs-list a { display: block; padding: 0.75rem 1rem; background-color: var(--bg-input); border-radius: var(--radius-md); border: 1px solid var(--border-input); transition: background-color 0.2s ease, border-color 0.2s ease; }
+#my-certs-list a:hover { background-color: var(--bg-hover); border-color: var(--border-subtle); }
+#my-certs-list a span { color: white; }
+
+/* FIX: Correctly position placeholder */
+#cert-placeholder {
+  display: flex; align-items: center; justify-content: center;
+  border: 2px dashed var(--border-input);
+  border-radius: var(--radius-xl);
+  min-height: 540px; /* Match height of certificate */
+  color: var(--text-tertiary);
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Certificate Display */
+#certificate-display-area > div { position: relative; background: linear-gradient(145deg, #1e293b, #020617); border-radius: var(--radius-xl); padding: 2.5rem; color: white; box-shadow: 0 10px 40px rgba(0,0,0,0.2); overflow: hidden; }
+#certificate-display-area > div::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: inherit; padding: 2px; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+#certificate-display-area .cert-header { text-align: center; padding-bottom: 1rem; border-bottom: 1px solid var(--border-subtle); margin-bottom: 2rem; }
+#certificate-display-area .cert-header h3 { font-size: 2rem; font-weight: 700; letter-spacing: 1px; color: white; }
+#certificate-display-area .cert-header p { color: var(--accent-blue); }
+#certificate-display-area .cert-body { text-align: center; margin-bottom: 2rem; }
+#certificate-display-area #cert-recipient-name { font-size: 2.75rem; color: var(--accent-blue); margin: 0.5rem 0; font-family: 'Times New Roman', Times, serif; }
+#certificate-display-area #cert-event-name { font-size: 1.75rem; color: white; font-weight: 700; }
+#certificate-display-area .cert-footer { border-top: 1px solid var(--border-subtle); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+#cert-id { font-family: var(--font-mono); }
+#verify-error { color: #F43F5E; text-align: center; font-weight: 500; margin-top: 1rem; }
+
+/* --- Landing Page (landing.html) --- */
+@keyframes animated-hero-bg {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.hero {
+  background: linear-gradient(-45deg, #0f172a, #1e3a8a, #3b0764, #0f172a);
+  background-size: 400% 400%;
+  animation: animated-hero-bg 20s ease infinite;
+  padding: 10rem 1.5rem 6rem 1.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-header { position: absolute; width: 100%; padding: 1rem; z-index: 10; }
+.landing-header > div { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;}
+.landing-header div:first-child { font-size: 1.5rem; font-weight: 700; color: white; }
+.landing-header a { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); color: white; font-weight: 500; border-radius: var(--radius-md); padding: 0.5rem 1rem; transition: background-color 0.2s; }
+.landing-header a:hover { background: rgba(255, 255, 255, 0.2); }
+
+.hero > div { position: relative; } /* Content must be above pseudo-element */
+.hero h1 { font-size: 3.5rem; line-height: 1.1; font-weight: 900; max-width: 800px; margin-left: auto; margin-right: auto; color: white;}
+.hero p { max-width: 700px; margin-left: auto; margin-right: auto; margin-bottom: 2rem; font-size: 1.25rem; }
+.hero a { display: inline-block; width: auto; font-size: 1.125rem; padding: 1rem 2.5rem; border-radius: var(--radius-lg); background: var(--accent-blue); color: var(--bg-dark); font-weight: 700; transition: all 0.3s ease; }
+.hero a:hover { background: white; transform: translateY(-3px) scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+
+.features { background-color: var(--bg-dark); padding: 4rem 1.5rem; border-top: 1px solid var(--border-input); }
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; max-width: 1200px; margin: 3rem auto 0 auto; }
+.features-grid > div {
+  text-align: center; padding: 2rem; background: var(--bg-card);
+  border: 1px solid var(--border-subtle); border-radius: var(--radius-xl);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.features-grid > div:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2), 0 0 30px var(--border-glow);
+}
+.features-grid .icon-container { height: 4rem; width: 4rem; margin: 0 auto 1.5rem auto; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--accent-blue); }
+.features-grid svg { width: 2rem; height: 2rem; color: white; }
+.features-grid h3 { color: white; }
+
+.landing-footer { background: var(--bg-input); padding: 1.5rem; text-align: center; color: var(--text-tertiary); }
+
+/* ----------------------- */
+/* -- 7. UTILITY CLASSES -- */
+/* ----------------------- */
+
+/* FIX: Restore the .hidden class functionality lost from Tailwind */
+.hidden {
+  display: none !important;
+}

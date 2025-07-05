@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeriChain - Admin Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+</head>
+<body>
+    <div id="app-container">
+        <header><h1>VeriChain Admin Panel</h1></header>
+        
+        <div id="auth-section">
+            <button id="connectButton">Connect Owner Wallet</button>
+        </div>
+        
+        <div id="dashboard" class="hidden">
+            <div>
+                <h2>System Configuration</h2>
+                <form id="set-distributor-form">
+                    <div>
+                        <label for="distributorAddress">Distributor Wallet Address (Gas Payer)</label>
+                        <input type="text" id="distributorAddress" placeholder="0x..." required>
+                    </div>
+                    <button type="submit">Set Distributor</button>
+                </form>
+            </div>
+            
+            <div>
+                <h2>Create New Event</h2>
+                <form id="create-event-form">
+                    <input type="text" id="eventName" placeholder="Event Name" required>
+                    <input type="date" id="eventDate" required>
+                    <input type="text" id="eventLocation" placeholder="Location" required>
+                    <button type="submit">Create Event</button>
+                </form>
+            </div>
+            
+            <div>
+                <h2>Issue Single Certificate</h2>
+                <form id="issue-single-form">
+                    <input type="number" id="singleEventId" placeholder="Event ID" required>
+                    <input type="text" id="recipientName" placeholder="Recipient Name" required>
+                    <input type="text" id="recipientAddress" placeholder="Recipient Wallet Address" required>
+                    <button type="submit">Issue Certificate</button>
+                </form>
+            </div>
+            
+            <div>
+                <h2>Issue Batch Certificates</h2>
+                <form id="issue-batch-form">
+                    <input type="number" id="batchEventId" placeholder="Event ID" required>
+                    <textarea id="csvData" rows="6" required placeholder="Paste CSV: Name,Address"></textarea>
+                    <button type="submit">Issue Batch</button>
+                </form>
+            </div>
+            
+            <div>
+                <h2>Generate Claim QR Code</h2>
+                <form id="generate-qr-form">
+                    <input type="number" id="qrEventId" placeholder="Event ID for QR Code" required>
+                    <button type="submit">Generate QR Code</button>
+                </form>
+                <div id="qr-code-container" class="hidden">
+                    <p>Display this to attendees:</p>
+                    <div id="qrcode"></div>
+                    <p>URL: <a id="claim-url" href="#" target="_blank"></a></p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="logger">
+            <p>Awaiting connection...</p>
+        </div>
+    </div>
+    
+<script>
+    // --- V3 CONFIGURATION ---
+    const contractAddress = "0xCd3F074104d3e9b09d04833F2Fb92ac92d8A1931";
+    const contractABI = [ { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "uint256", "name": "certificateId", "type": "uint256" }, { "indexed": true, "internalType": "uint256", "name": "eventId", "type": "uint256" }, { "indexed": false, "internalType": "string", "name": "recipientName", "type": "string" }, { "indexed": true, "internalType": "address", "name": "recipientAddress", "type": "address" } ], "name": "CertificateIssued", "type": "event" }, { "inputs": [ { "internalType": "uint256", "name": "_eventId", "type": "uint256" }, { "internalType": "string", "name": "_recipientName", "type": "string" }, { "internalType": "address", "name": "_recipientAddress", "type": "address" } ], "name": "claimCertificate", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "string", "name": "_name", "type": "string" }, { "internalType": "uint256", "name": "_date", "type": "uint256" }, { "internalType": "string", "name": "_location", "type": "string" } ], "name": "createEvent", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "newDistributor", "type": "address" } ], "name": "DistributorChanged", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "uint256", "name": "eventId", "type": "uint256" }, { "indexed": false, "internalType": "string", "name": "name", "type": "string" }, { "indexed": false, "internalType": "uint256", "name": "date", "type": "uint256" } ], "name": "EventCreated", "type": "event" }, { "inputs": [ { "internalType": "uint256", "name": "_eventId", "type": "uint256" }, { "internalType": "string[]", "name": "_recipientNames", "type": "string[]" }, { "internalType": "address[]", "name": "_recipientAddresses", "type": "address[]" } ], "name": "issueBatchCertificates", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "_eventId", "type": "uint256" }, { "internalType": "string", "name": "_recipientName", "type": "string" }, { "internalType": "address", "name": "_recipientAddress", "type": "address" } ], "name": "issueSingleCertificate", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "_newDistributor", "type": "address" } ], "name": "setDistributor", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "certificateCounter", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "name": "certificates", "outputs": [ { "internalType": "uint256", "name": "id", "type": "uint256" }, { "internalType": "uint256", "name": "eventId", "type": "uint256" }, { "internalType": "string", "name": "recipientName", "type": "string" }, { "internalType": "address", "name": "recipientAddress", "type": "address" }, { "internalType": "uint256", "name": "issueDate", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "distributor", "outputs": [ { "internalType": "address", "name": "", "type": "address" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "eventCounter", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "name": "events", "outputs": [ { "internalType": "uint256", "name": "id", "type": "uint256" }, { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "uint256", "name": "date", "type": "uint256" }, { "internalType": "string", "name": "location", "type": "string" }, { "internalType": "uint256", "name": "certificatesIssued", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "_certificateId", "type": "uint256" } ], "name": "getCertificateDetails", "outputs": [ { "components": [ { "internalType": "uint256", "name": "id", "type": "uint256" }, { "internalType": "uint256", "name": "eventId", "type": "uint256" }, { "internalType": "string", "name": "recipientName", "type": "string" }, { "internalType": "address", "name": "recipientAddress", "type": "address" }, { "internalType": "uint256", "name": "issueDate", "type": "uint256" } ], "internalType": "struct VeriChain.Certificate", "name": "", "type": "tuple" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "_eventId", "type": "uint256" } ], "name": "getEventDetails", "outputs": [ { "components": [ { "internalType": "uint256", "name": "id", "type": "uint256" }, { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "uint256", "name": "date", "type": "uint256" }, { "internalType": "string", "name": "location", "type": "string" }, { "internalType": "uint256", "name": "certificatesIssued", "type": "uint256" }, { "internalType": "uint256[]", "name": "certificateIds", "type": "uint256[]" } ], "internalType": "struct VeriChain.Event", "name": "", "type": "tuple" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "owner", "outputs": [ { "internalType": "address", "name": "", "type": "address" } ], "stateMutability": "view", "type": "function" } ];
+
+    const logger = document.getElementById('logger');
+    let provider, signer, contract;
+    
+    function log(message, isError = false) {
+        const p = document.createElement('p');
+        p.innerHTML = `<span>${new Date().toLocaleTimeString()}:</span> ${message}`;
+        p.className = isError ? 'log-error' : 'log-success';
+        logger.appendChild(p);
+        logger.scrollTop = logger.scrollHeight;
+    }
+
+    document.getElementById('connectButton').addEventListener('click', async () => {
+        if (typeof window.ethereum === 'undefined') return log("MetaMask is not installed.", true);
+        try {
+            log("Connecting...");
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0xaa36a7' }]});
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            signer = provider.getSigner();
+            contract = new ethers.Contract(contractAddress, contractABI, signer);
+            const ownerAddress = await contract.owner();
+            const connectedAddress = await signer.getAddress();
+            if (connectedAddress.toLowerCase() === ownerAddress.toLowerCase()) {
+                log("Authentication successful.");
+                document.getElementById('auth-section').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+            } else {
+                log("Authentication failed: Connected wallet is not the owner.", true);
+            }
+        } catch (error) { log(`Connection Error: ${error.message}`, true); }
+    });
+
+    // --- FORM HANDLERS ---
+    document.getElementById('set-distributor-form').addEventListener('submit', async (e) => { e.preventDefault(); const distributorAddr = document.getElementById('distributorAddress').value; log(`Setting distributor to ${distributorAddr}...`); try { const tx = await contract.setDistributor(distributorAddr); log(`Tx sent: ${tx.hash}. Waiting...`); await tx.wait(); log(`✅ Success! Distributor set.`, false); } catch (error) { log(`Error: ${error.message}`, true); } });
+    document.getElementById('create-event-form').addEventListener('submit', async (e) => { e.preventDefault(); const d = new Date(document.getElementById('eventDate').value).getTime() / 1000; log(`Creating event...`); try { const t = await contract.createEvent(document.getElementById('eventName').value, d, document.getElementById('eventLocation').value); log(`Tx sent: ${t.hash}. Waiting...`); const r = await t.wait(); const i = r.events?.find(ev => ev.event === 'EventCreated').args.eventId; log(`✅ Success! Event #${i.toString()} created.`); e.target.reset(); } catch (err) { log(`Error: ${err.message}`, true); } });
+    document.getElementById('issue-single-form').addEventListener('submit', async (e) => { e.preventDefault(); log(`Issuing single certificate...`); try { const t = await contract.issueSingleCertificate(document.getElementById('singleEventId').value, document.getElementById('recipientName').value, document.getElementById('recipientAddress').value); log(`Tx sent: ${t.hash}. Waiting...`); await t.wait(); log(`✅ Success! Certificate issued.`); e.target.reset(); } catch (err) { log(`Error: ${err.message}`, true); } });
+    document.getElementById('issue-batch-form').addEventListener('submit', async (e) => { e.preventDefault(); const eventId = document.getElementById('batchEventId').value; const rows = document.getElementById('csvData').value.split('\n').filter(r => r.trim() !== ''); const names = rows.map(r => r.split(',')[0].trim()); const addresses = rows.map(r => r.split(',')[1].trim()); log(`Issuing batch of ${names.length} certificates...`); try { const t = await contract.issueBatchCertificates(eventId, names, addresses); log(`Tx sent: ${t.hash}. Waiting...`); await t.wait(); log(`✅ Success! Batch issued.`); e.target.reset(); } catch (err) { log(`Error: ${err.message}`, true); } });
+    document.getElementById('generate-qr-form').addEventListener('submit', (e) => { e.preventDefault(); const eventId = document.getElementById('qrEventId').value; if (!eventId) return; const claimPageUrl = `${window.location.origin}/claim.html?eventId=${eventId}`; const qrcodeDiv = document.getElementById('qrcode'); qrcodeDiv.innerHTML = ''; new QRCode(qrcodeDiv, { text: claimPageUrl, width: 256, height: 256 }); document.getElementById('claim-url').href = claimPageUrl; document.getElementById('claim-url').textContent = claimPageUrl; document.getElementById('qr-code-container').classList.remove('hidden'); });
+</script>
+</body>
+</html>
